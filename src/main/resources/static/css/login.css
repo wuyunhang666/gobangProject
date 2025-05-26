@@ -1,0 +1,71 @@
+.login-container{
+    height: calc(100% - 50px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-dialog{
+    width: 400px;
+    height: 400px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+}
+html, body{
+    height: 100%;
+    background-image: url(../image/login_background.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+/*标题部分*/
+.login-dialog h3{
+    text-align: center;
+    padding: 50px 0;
+}
+.login-dialog .row{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-dialog .row span{
+    width: 100px;
+    font-weight: 666;
+}
+#username,#password{
+    width: 200px;
+    height: 40px;
+    font-size: 20px;
+    line-height: 40px;
+    padding-left: 10px;
+     border: none;
+     outline: none;
+     border-radius: 10px;
+}
+#submit{
+    width: 300px;
+    height: 50px;
+    background-color: rgb(0,128,0);
+    color: white;
+    border:none;
+    outline: none;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+#submit:active{
+    background-color:#968e8e;
+}
+.register {
+    text-align: center;
+    margin-top: 30px;
+}
+.register button {
+    background: none;
+    border: none;
+    color: #007BFF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.register button:hover {
+    color: #0056b3;
+}

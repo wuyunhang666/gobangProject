@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏大厅</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/game_hall.css">
+</head>
+<body>
+    <div class="nav">五子棋在线对战</div>
+    <div class="container">
+        <div>
+            <!--展示用户信息-->
+            <div id="screen"></div>
+            <div id="match-button">开始匹配</div>
+        </div>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script>
+        $.ajax({
+            type:'get',
+            url: '/userInfo',
+            success: function(body){
+                let screenDiv = document.querySelector("#screen");
+                screenDiv.innerHTML = '玩家：'+body.username + " 分数："+body.score + '<br> 比赛场次：'+body.totalCount+" 获胜场次："+body.winCount
+            },
+            error: function(){
+                alert("获取用户信息发生异常！");
+            }
+        });
+        //初始化websocket
+        let websocketUrl = 'ws://'+location.host+'/findMatch';
+        let websocket = new WebSocket(websocketUrl);
+        websocket.onopen = function(){
+            console.log("onopen");
+        }
+        websocket.onclose = function(){
+            console.log("onclose");
+        }
+        websocket.onerror = function(){
+            console.log("onerror");
+        }
+        //页面退出时调用close
+        window.onbeforeunload=function(){
+            websocket.close();
+        }
+        websocket.onmessage = function(e){
+            console.log(e)
+            //处理服务端返回的信息
+            let resp = JSON.parse(e.data);
+            let matchButton = document.querySelector("#match-button");
+            if(!resp.ok){
+                console.log("游戏大厅中接收到了失败响应！"+resp.reason);
+                return;
+            }
+            if(resp.message == 'startMatch'){
+                console.log('进入匹配队列');
+                matchButton.innerHTML='匹配中...（点击停止）';
+            }else if(resp.message=='stopMatch'){
+                console.log('离开匹配队列成功！');
+                matchButton.innerHTML='开始匹配';
+            }else if(resp.message=='matchSuccess'){
+                console.log('匹配成功');
+                location.replace("/game_room.html");//一定要使用replace，不然浏览器回退会出现问题
+            }else if(resp.message=='repeatConnection'){
+                alert("请勿重复登录一个账号！");
+                location.replace("/login.html");
+            }else{
+                console.log('收到了非法响应，请联系管理员处理！'+resp.message);
+            }
+        }
+        let matchButton = document.querySelector("#match-button");
+        matchButton.onclick = function(){
+            if(websocket.readyState == websocket.OPEN){
+                if(matchButton.innerHTML=='开始匹配'){
+                    console.log('开始匹配');
+                    websocket.send(JSON.stringify({
+                        message:'startMatch',
+                    }));
+                }else if(matchButton.innerHTML=='匹配中...（点击停止）'){
+                    console.log("停止匹配");
+                    websocket.send(JSON.stringify({
+                        message:"stopMatch",
+                    }));
+                }else{
+                    alert("连接已断开，请重新登录！");
+                    location.replace('/login.html');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
